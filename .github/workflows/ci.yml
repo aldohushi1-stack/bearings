@@ -23,10 +23,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm test
+      - name: Self-map is committed and current
+        run: node bin/bearings.mjs check .
       - name: Self-map
-        run: |
-          node bin/bearings.mjs build . --print --force
-          node bin/bearings.mjs check .
+        run: node bin/bearings.mjs build . --print --force
       - name: Hook emit smoke test
         shell: bash
         run: |

@@ -57,4 +57,4 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - CHANGELOG.md, DESIGN.md, README.md, src/build.mjs, src/fingerprint.mjs
 
 ---
-bearings 0.1.0 · fingerprint b46b4903 · budget 1500 · est. 618 tokens
+bearings 0.1.0 · fingerprint 56c321e8 · budget 1500 · est. 618 tokens
