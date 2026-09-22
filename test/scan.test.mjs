@@ -1,4 +1,6 @@
 import { test } from 'node:test';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import assert from 'node:assert/strict';
 import { scan, compileIgnore, matchesIgnore } from '../src/scan.mjs';
 import { fingerprint } from '../src/fingerprint.mjs';
@@ -85,16 +87,43 @@ test('compileIgnore / matchesIgnore cover the documented forms', () => {
   assert.equal(matchesIgnore(rules, 'src/main.js', false), false);
 });
 
-test('fingerprint is stable, changes on touch, ignores the output file', async () => {
+test('fingerprint is stable, ignores the output file, and sees a change', async () => {
   const dir = await tempDir();
   await writeTree(dir, { 'a.js': '1', 'b.js': '2' });
-  const f1 = fingerprint(await scan(dir, { outFile: 'BEARINGS.md' }));
-  const f2 = fingerprint(await scan(dir, { outFile: 'BEARINGS.md' }));
-  assert.equal(f1, f2);
+  const fp = async () => fingerprint(dir, await scan(dir, { outFile: 'BEARINGS.md' }));
+  const f1 = await fp();
+  assert.equal(await fp(), f1);
   assert.match(f1, /^[0-9a-f]{64}$/);
   await writeTree(dir, { 'BEARINGS.md': 'map', '.bearings/state.json': '{}' });
-  assert.equal(fingerprint(await scan(dir, { outFile: 'BEARINGS.md' })), f1, 'writing the map does not change it');
+  assert.equal(await fp(), f1, 'writing the map does not change it');
   await writeTree(dir, { 'a.js': '111' });
-  assert.notEqual(fingerprint(await scan(dir, { outFile: 'BEARINGS.md' })), f1, 'content size change is seen');
+  assert.notEqual(await fp(), f1, 'content size change is seen');
+  await rm(dir);
+});
+
+test('fingerprint is content-based: mtimes do not move it, same-size edits do', async () => {
+  const dir = await tempDir();
+  await writeTree(dir, { 'a.js': 'aaa', 'b.js': 'bbb' });
+  const fp = async () => fingerprint(dir, await scan(dir, { outFile: 'BEARINGS.md' }));
+  const f1 = await fp();
+
+  const later = new Date(Date.now() + 1000 * 60 * 60);
+  await fs.utimes(path.join(dir, 'a.js'), later, later);
+  assert.equal(await fp(), f1, 'touching a file does not change the fingerprint');
+
+  await writeTree(dir, { 'a.js': 'zzz' });                    // same length, different bytes
+  assert.notEqual(await fp(), f1, 'a same-size edit is seen');
+  await rm(dir);
+});
+
+test('fingerprint never reads a credential-looking file', async () => {
+  const dir = await tempDir();
+  await writeTree(dir, { 'a.js': '1', '.env': 'API_KEY=one' });
+  const fp = async () => fingerprint(dir, await scan(dir, { outFile: 'BEARINGS.md' }));
+  const f1 = await fp();
+  await writeTree(dir, { '.env': 'API_KEY=two' });             // same size, different secret
+  assert.equal(await fp(), f1, '.env contents are never read, so they cannot move the fingerprint');
+  await writeTree(dir, { '.env': 'API_KEY=a much longer secret' });
+  assert.notEqual(await fp(), f1, 'but its size still counts');
   await rm(dir);
 });

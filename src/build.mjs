@@ -40,7 +40,7 @@ export async function buildModel(root, { outFile = DEFAULT_OUT } = {}) {
   root = path.resolve(root);
   const s = await scan(root, { outFile });
   const model = await detect(root, s);
-  model.fingerprint = fingerprint(s);
+  model.fingerprint = await fingerprint(root, s);
   model.outFile = outFile;
 
   const sources = filesOf(s).filter((f) => !f.asset && !f.sensitive && !f.lockfile && languageOf(f.path) && f.size <= MAX_SOURCE_BYTES).slice(0, MAX_SOURCE_FILES);
@@ -66,10 +66,15 @@ export async function readState(root) {
 export async function isStale(root, { outFile = DEFAULT_OUT } = {}) {
   root = path.resolve(root);
   const state = await readState(root);
-  if (!state) return true;
-  try { await fs.access(path.join(root, state.out || outFile)); } catch { return true; }
-  const s = await scan(root, { outFile: state.out || outFile });
-  return fingerprint(s) !== state.fingerprint;
+  const out = state?.out || outFile;
+  let existing;
+  try { existing = await fs.readFile(path.join(root, out), 'utf8'); } catch { return true; }
+  const fp = await fingerprint(root, await scan(root, { outFile: out }));
+  if (state) return fp !== state.fingerprint;
+  // A fresh clone has no .bearings/ — it is gitignored — but a committed map carries its own
+  // fingerprint in the footer, which is enough to say whether it still describes this tree.
+  const m = existing.match(/fingerprint ([0-9a-f]{8})/);
+  return m ? m[1] !== fp.slice(0, 8) : true;
 }
 
 /**
@@ -90,7 +95,7 @@ export async function build(root, { budget = DEFAULT_BUDGET, out = DEFAULT_OUT, 
     const s = await scan(root, { outFile });
     let existing = null;
     try { existing = await fs.readFile(outPath, 'utf8'); } catch {}
-    if (existing !== null && fingerprint(s) === state.fingerprint) {
+    if (existing !== null && (await fingerprint(root, s)) === state.fingerprint) {
       return { markdown: existing, estimate: state.estimate, dropped: state.dropped || [], changed: false, outPath, model: null };
     }
   }

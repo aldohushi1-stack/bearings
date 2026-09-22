@@ -88,7 +88,7 @@ This writes `BEARINGS.md`, a `.bearings/state.json` fingerprint, and adds a `Ses
   "hooks": [ { "type": "command", "command": "npx -y get-bearings emit", "timeout": 30 } ] } ] } }
 ```
 
-Commit `BEARINGS.md` or add it to `.gitignore` — either is fine. It has no timestamps, so an unchanged tree produces a byte-identical file.
+Commit `BEARINGS.md` or add it to `.gitignore` — either is fine. It has no timestamps and its fingerprint is over file contents, not mtimes, so the same commit produces the same file on every machine.
 
 **For every project** (one hook in `~/.claude/settings.json`):
 
@@ -125,7 +125,7 @@ bearings emit                   hook entry point: stdin JSON in, hook JSON out (
 bearings watch [DIR]            rebuild on change
 ```
 
-`--budget 0` means unlimited. `--json` also writes `.bearings/map.json` with the full model (kind, scripts, entries, ranked modules with scores) for your own tooling. `check` is a local gate (pre-commit, "did I forget to rebuild"); the fingerprint includes mtimes, so on a fresh clone it will always say stale — in CI, run `build`.
+`--budget 0` means unlimited. `--json` also writes `.bearings/map.json` with the full model (kind, scripts, entries, ranked modules with scores) for your own tooling. `check` works as a pre-commit gate and in CI: the fingerprint is over file contents, and on a fresh clone — where `.bearings/` is gitignored and absent — it falls back to the fingerprint the committed map carries in its footer.
 
 ## How it works
 
@@ -134,7 +134,7 @@ bearings watch [DIR]            rebuild on change
 3. **Extract** — names, not signatures. Regex extractors for JS/TS (every `export` form plus CommonJS), Python (`def`/`class`/`__all__`/`__init__` re-exports), Go (capitalised) and Rust (`pub`). Imports are resolved to project files to count who-imports-whom.
 4. **Rank** — `10·entry + 2·importedBy + 1·inSrc − depth − 5·test − 3·config − 4·example`, ties by path. Test helpers imported by tests don't count.
 5. **Render within budget** — identity, run & test, entry points and rules are always kept. When the estimate is over budget the renderer degrades in a fixed order: trim modules, drop recent, flatten layout, truncate script lists, truncate layout, shorten the description. The footer records the estimate so you can see how close to the budget the map sits.
-6. **Stay fresh** — a SHA-256 over every file's path, size and mtime. `emit` and `print` rebuild only when it changed; `check` exits 1 when it has. No watcher needed, though `watch` exists.
+6. **Stay fresh** — a SHA-256 over every file's path, size and contents (assets and `.env` by path and size alone; nothing hashed past 256 KB). `emit` and `print` rebuild only when it changed; `check` exits 1 when it has. No watcher needed, though `watch` exists.
 
 Full design notes, including the degradation order and the prior-art comparison, are in [DESIGN.md](DESIGN.md).
 

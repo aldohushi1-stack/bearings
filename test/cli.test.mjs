@@ -116,3 +116,20 @@ test('an empty folder still builds a map', async () => {
   assert.ok(t.out().includes('empty'));
   await rm(dir);
 });
+
+test('check works on a fresh checkout with no .bearings/ — the CI gate', async () => {
+  const dir = await tempCopy('node-cli');
+  assert.equal(await main(['build', dir], io().opts), 0);
+  // What a clone looks like: the map is committed, .bearings/ is gitignored and absent.
+  await rm(path.join(dir, '.bearings'));
+
+  let t = io();
+  assert.equal(await main(['check', dir], t.opts), 0, 'the committed map still describes this tree');
+  assert.ok(t.out().includes('fresh'));
+
+  await writeTree(dir, { 'src/new.mjs': 'export const n = 1;\n' });
+  t = io();
+  assert.equal(await main(['check', dir], t.opts), 1, 'and goes stale when the tree changes');
+
+  await rm(dir);
+});

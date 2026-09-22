@@ -14,7 +14,7 @@ The existing fixes are symbol maps: aider's repo map, `atlas` (Rust), `agentmap`
 
 1. **Builds** a short orientation map of a folder — `BEARINGS.md` — within a token budget (default 1,500 tokens).
 2. **Delivers** it to Claude Code automatically through a `SessionStart` hook that fires on startup, resume, clear and compact, so the map is always in context and never has to be asked for.
-3. **Stays fresh** without a watcher: the hook fingerprints the tree (paths, sizes, mtimes) and rebuilds only when something changed. A `watch` mode exists for people who read the file mid-session or feed other agents.
+3. **Stays fresh** without a watcher: the hook fingerprints the tree (paths, sizes, contents) and rebuilds only when something changed. A `watch` mode exists for people who read the file mid-session or feed other agents.
 4. **Works on any folder**, not just a git repository or a codebase: a single-file HTML game, a Python script, a docs folder, or a Desktop folder holding thirty projects each get a sensible map.
 
 Zero dependencies, Node ≥ 20, one command to install: `npx get-bearings init`.
@@ -54,7 +54,7 @@ The Markdown is written for two readers: an agent that wants facts in the first 
 - **`.gitignore`** at the root and in subdirectories is honoured with a small matcher: `dir/`, `*.ext`, `name`, `path/to/x`, `**/x`, `!negation`. Good enough for real repos; the unit tests pin exactly what is supported.
 - **`.bearingsignore`** uses the same syntax for things you want out of the map but not out of git.
 - Content is read only from: manifests and config files, README, rules files, and source files chosen for extraction (≤ 2,000 files, ≤ 256 KB each). Everything else is name/size/mtime only.
-- Fingerprint = SHA-256 over the sorted list of `path\0size\0mtimeMs` for every walked entry, excluding the output file and `.bearings/`. Stored with the build in `.bearings/state.json`.
+- Fingerprint = SHA-256 over the sorted list of `path\0size\0sha256(contents)` for every walked entry, excluding the output file and `.bearings/`. Assets and credential-looking files contribute path and size only — the map never prints their bytes, and `.env` is never read at all — and no file is hashed past 256 KB, the ceiling `detect` itself reads at. Stored with the build in `.bearings/state.json`, and its first 8 characters appear in the map footer.
 
 ## 6. Budget
 
@@ -143,7 +143,11 @@ Other agents: `bearings print` pipes into anything; the README shows the one-lin
 
 ### What `check` is for
 
-The fingerprint is mtime-based, so `check` is a local gate (pre-commit, a watcher, "did I forget to rebuild") — not a CI assertion. A fresh clone has new mtimes and no `.bearings/state.json`, so `check` will always say stale there; CI should run `build` and, if it wants a diff, compare everything above the footer.
+The fingerprint is content-based, so `check` is both a local gate (pre-commit, a watcher, "did I forget to rebuild") and a CI assertion. A fresh clone has no `.bearings/state.json` — it is gitignored — so `check` falls back to the fingerprint the committed map carries in its own footer, and still answers correctly.
+
+It was not always so. The fingerprint used to be `path\0size\0mtimeMs`, and mtimes are restamped by a clone or a checkout, so the same tree hashed differently on every machine: `check` could only ever say "stale" on a fresh clone, and the footer changed without the project changing. Hashing contents costs something — about 300 ms on a 2,700-file, 1.1 GB tree, against a full rebuild of roughly 650 ms — so the fast path is still the fast path, and the gate now means what it says.
+
+One thing `check` does not cover: Recent comes from the commit history, so committing changes the map without changing any file's contents. `check` verifies that the map still describes the *tree*, not that Recent names the latest commit.
 
 ### Why Recent comes from git
 
