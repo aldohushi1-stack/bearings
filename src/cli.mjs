@@ -47,12 +47,23 @@ async function readStdin(opts) {
   if (process.stdin.isTTY) return '';
   return new Promise((resolve) => {
     let data = '';
-    const done = () => resolve(data);
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      try { process.stdin.pause(); process.stdin.unref?.(); } catch {}
+      resolve(data);
+    };
     const timer = setTimeout(done, 2000);
     process.stdin.setEncoding('utf8');
-    process.stdin.on('data', (c) => { data += c; });
-    process.stdin.on('end', () => { clearTimeout(timer); done(); });
-    process.stdin.on('error', () => { clearTimeout(timer); done(); });
+    process.stdin.on('data', (c) => {
+      data += c;
+      // Claude Code writes one JSON object; stop as soon as it parses instead of waiting for EOF.
+      try { JSON.parse(data); done(); } catch {}
+    });
+    process.stdin.on('end', done);
+    process.stdin.on('error', done);
   });
 }
 
@@ -61,7 +72,8 @@ async function ensureGitignore(root, line) {
   const p = path.join(root, '.gitignore');
   let text;
   try { text = await fs.readFile(p, 'utf8'); } catch { return false; }
-  if (text.split(/\r?\n/).some((l) => l.trim() === line || l.trim() === line.replace(/\/$/, ''))) return false;
+  const want = line.replace(/\/$/, '');
+  if (text.split(/\r?\n/).some((l) => l.trim().replace(/^\//, '').replace(/\/$/, '') === want)) return false;
   const eol = text.includes('\r\n') ? '\r\n' : '\n';
   await fs.writeFile(p, text + (text.endsWith('\n') || !text ? '' : eol) + line + eol, 'utf8');
   return true;
@@ -75,9 +87,10 @@ export async function main(argv, opts = {}) {
   const out = opts.stdout || ((s) => process.stdout.write(s));
   const err = opts.stderr || ((s) => process.stderr.write(s));
   const cwd = opts.cwd || process.cwd();
-  const home = opts.home || os.homedir();
+  const homeDir = () => opts.home || os.homedir(); // lazy: os.homedir() can throw in odd containers
   const args = parseArgs(argv);
   const cmd = args._[0] || 'build';
+  if (args.flags.budget === true || args.flags.out === true || args.flags.command === true) { err('--budget, --out and --command need a value\n'); return 2; }
   const budget = args.flags.budget !== undefined ? Number(args.flags.budget) : DEFAULT_BUDGET;
   const outFile = typeof args.flags.out === 'string' ? args.flags.out : DEFAULT_OUT;
   const dirArg = (i) => path.resolve(cwd, args._[i] || '.');
@@ -109,18 +122,20 @@ export async function main(argv, opts = {}) {
       }
       case 'init': {
         const root = dirArg(1);
-        const r = await build(root, { budget, out: outFile, force: true });
+        // Hook and .gitignore first, so the map built last is fresh (they are part of the tree).
         const settingsPath = path.join(root, '.claude', 'settings.json');
         const h = await installHook({ settingsPath, command: args.flags.command, budget: args.flags.budget !== undefined ? budget : undefined });
+        const gi = await ensureGitignore(root, '.bearings/');
+        const r = await build(root, { budget, out: outFile, force: true });
         out(`${path.relative(cwd, r.outPath) || outFile} written · est. ${r.estimate} tokens\n`);
         out(`${h.changed ? 'hook installed' : 'hook already installed'} in ${path.relative(cwd, settingsPath)} → ${h.command}\n`);
-        if (await ensureGitignore(root, '.bearings/')) out('.bearings/ added to .gitignore\n');
+        if (gi) out('.bearings/ added to .gitignore\n');
         out(`Next Claude Code session in this folder starts with the map in context. Commit ${outFile} or add it to .gitignore — either is fine.\n`);
         return 0;
       }
       case 'hook': {
         const sub = args._[1];
-        const settingsPath = args.flags.global ? path.join(home, '.claude', 'settings.json') : path.join(cwd, '.claude', 'settings.json');
+        const settingsPath = args.flags.global ? path.join(homeDir(), '.claude', 'settings.json') : path.join(cwd, '.claude', 'settings.json');
         if (sub === 'install') {
           const h = await installHook({ settingsPath, command: args.flags.command, budget: args.flags.budget !== undefined ? budget : undefined });
           out(`${h.changed ? 'hook installed' : 'hook already installed'} in ${settingsPath} → ${h.command}\n`);
@@ -142,7 +157,7 @@ export async function main(argv, opts = {}) {
             const input = JSON.parse(await readStdin(opts));
             if (input && typeof input.cwd === 'string' && input.cwd) root = input.cwd;
           } catch {}
-          const r = await build(root, { budget, out: outFile });
+          const r = await build(root, { budget, out: outFile, allowUnwritable: true });
           out(hookOutput(r.markdown, outFile));
         } catch {}
         return 0;

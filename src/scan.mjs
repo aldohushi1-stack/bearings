@@ -21,6 +21,9 @@ const ASSET_EXT = new Set([
   'glb', 'gltf', 'stl', '3mf', 'fbx', 'blend', 'lock', 'lockb',
 ]);
 
+/** Files never listed: the agent's own scratch state, which would otherwise churn "Recent". */
+const DEFAULT_IGNORE_FILES = new Set(['.claude/settings.local.json', '.DS_Store', 'Thumbs.db', 'desktop.ini']);
+
 const LOCKFILES = new Set([
   'package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'bun.lockb', 'bun.lock', 'uv.lock',
   'poetry.lock', 'Pipfile.lock', 'Cargo.lock', 'go.sum', 'composer.lock', 'Gemfile.lock',
@@ -56,7 +59,12 @@ function globToRegex(glob) {
         else { re += '.*'; i += 1; }
       } else re += '[^/]*';
     } else if (c === '?') re += '[^/]';
-    else if ('.+^${}()|[]\\'.includes(c)) re += '\\' + c;
+    else if (c === '[') {
+      // Character class, e.g. [Bb]in or *.py[cod]; pass it through when it closes.
+      const close = glob.indexOf(']', i + 1);
+      if (close > i + 1) { re += '[' + glob.slice(i + 1, close).replace(/\\/g, '\\\\').replace(/^!/, '^') + ']'; i = close; }
+      else re += '\\[';
+    } else if ('.+^${}()|]\\'.includes(c)) re += '\\' + c;
     else re += c;
   }
   return re;
@@ -118,7 +126,7 @@ export function matchesIgnore(rules, relPath, isDir) {
 
 async function readIgnoreFile(p, base) {
   try {
-    const text = await fs.readFile(p, 'utf8');
+    const text = (await fs.readFile(p, 'utf8')).replace(/^\uFEFF/, '');
     return compileIgnore(text.split('\n'), base);
   } catch { return []; }
 }
@@ -179,6 +187,7 @@ export async function scan(root, opts = {}) {
       }
       if (!d.isFile()) continue;
       if (relPath === outFile || name === outBase) continue; // the map itself, at any depth
+      if (DEFAULT_IGNORE_FILES.has(relPath) || DEFAULT_IGNORE_FILES.has(name)) continue;
       if (matchesIgnore(rules, relPath, false)) continue;
       let st;
       try { st = await fs.stat(path.join(abs, name)); } catch { continue; }

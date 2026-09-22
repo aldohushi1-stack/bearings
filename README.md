@@ -125,7 +125,7 @@ bearings emit                   hook entry point: stdin JSON in, hook JSON out (
 bearings watch [DIR]            rebuild on change
 ```
 
-`--budget 0` means unlimited. `--json` also writes `.bearings/map.json` with the full model (kind, scripts, entries, ranked modules with scores) for your own tooling.
+`--budget 0` means unlimited. `--json` also writes `.bearings/map.json` with the full model (kind, scripts, entries, ranked modules with scores) for your own tooling. `check` is a local gate (pre-commit, "did I forget to rebuild"); the fingerprint includes mtimes, so on a fresh clone it will always say stale — in CI, run `build`.
 
 ## How it works
 

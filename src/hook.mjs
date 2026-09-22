@@ -5,7 +5,7 @@ export const HOOK_MATCHER = 'startup|resume|clear|compact';
 export const DEFAULT_COMMAND = 'npx -y get-bearings emit';
 export const HOOK_TIMEOUT = 30;
 
-const OURS = /(^|\s|\/)(npx\s+(-y\s+)?)?(get-)?bearings(\.mjs|\.cmd)?"?\s+emit(\s|$)/;
+const OURS = /(^|\s|[\/\\])(npx\s+(-y\s+)?)?(get-)?bearings(\.mjs|\.cmd)?"?\s+emit(\s|$)/;
 
 export function isOurs(hook) { return hook?.type === 'command' && typeof hook.command === 'string' && OURS.test(hook.command); }
 

@@ -49,7 +49,7 @@ The Markdown is written for two readers: an agent that wants facts in the first 
 
 ## 5. Scanning
 
-- Walk from the root, depth ≤ 8, at most 20,000 entries; sorted order at every level so output is deterministic.
+- Walk from the root breadth-first, depth ≤ 8, at most 20,000 entries; sorted order at every level so output is deterministic, and shallow files (manifests, README, entry points) are always seen before a huge subtree exhausts the cap.
 - **Default ignores**: `.git`, `node_modules`, `dist`, `build`, `out`, `coverage`, `.next`, `.nuxt`, `.cache`, `.turbo`, `__pycache__`, `.venv`, `venv`, `.tox`, `target`, `vendor`, `.idea`, `.DS_Store`, `.bearings`, plus `*.min.*`, lockfiles (counted, never read), binary extensions (images, fonts, archives, media, wasm) — counted as assets, never read.
 - **`.gitignore`** at the root and in subdirectories is honoured with a small matcher: `dir/`, `*.ext`, `name`, `path/to/x`, `**/x`, `!negation`. Good enough for real repos; the unit tests pin exactly what is supported.
 - **`.bearingsignore`** uses the same syntax for things you want out of the map but not out of git.
@@ -130,7 +130,7 @@ Other agents: `bearings print` pipes into anything; the README shows the one-lin
 
 `node --test`, zero dependencies. Fixtures are small real-shaped projects under `test/fixtures/` (`node-cli`, `python-pkg`, `single-html`, `folder-of-projects`, `monorepo`) plus temp dirs built in-test for mtime and ignore cases.
 
-- scan: default ignores, `.gitignore` forms, `.bearingsignore`, depth cap, forward slashes on every platform, output file and `.bearings/` excluded from the fingerprint.
+- scan: default ignores, `.gitignore` forms (including nested files, character classes and a BOM), `.bearingsignore`, depth cap, breadth-first order, forward slashes on every platform, output file and `.bearings/` excluded from the fingerprint.
 - detect: each kind in the table.
 - extract: every export form listed in §7; Python `__all__` precedence; import resolution.
 - rank: entry first, importedBy boost, tests penalised.
@@ -139,6 +139,11 @@ Other agents: `bearings print` pipes into anything; the README shows the one-lin
 - cli: `build` writes both files; `check` exits 1 after a change and 0 after rebuild; `print`; `emit` returns valid hook JSON with `additionalContext` and never throws on bad stdin or a missing folder; `--version`.
 - hook: install writes the right shape, idempotent, preserves unrelated hooks, uninstall removes only ours; `--global` targets the home settings; `--command` respected.
 - Windows: path normalisation and CRLF manifests through the same tests (the code has no platform branches to test).
+- regressions (`test/regressions.test.mjs`): every bug the 0.1.0 adversarial review reproduced — cubic backtracking in the JS import regex, `[Bb]in/` character classes and BOM'd `.gitignore`, backslash hook commands, `init` leaving a stale map, read-only folders, `--out` absolute paths, `.claude/settings.local.json` churn.
+
+### What `check` is for
+
+The fingerprint is mtime-based, so `check` is a local gate (pre-commit, a watcher, "did I forget to rebuild") — not a CI assertion. A fresh clone has new mtimes and no `.bearings/state.json`, so `check` will always say stale there; CI should run `build` and, if it wants a diff, compare everything above the Recent section.
 
 ## 13. Prior art
 

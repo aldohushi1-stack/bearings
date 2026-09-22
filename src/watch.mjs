@@ -21,14 +21,18 @@ export async function watch(root, { budget, out, log = () => {}, interval = 2000
   const schedule = () => { clearTimeout(timer); timer = setTimeout(rebuild, 500); };
   const ignored = (file) => !file || file.startsWith('.bearings') || file.replace(/\\/g, '/') === out;
 
+  let failed = false;
   try {
     const w = fs.watch(root, { recursive: true }, (_ev, file) => { if (!ignored(file)) schedule(); });
-    await new Promise((resolve) => { w.on('error', resolve); process.on('SIGINT', () => { w.close(); resolve(); }); });
-  } catch {
-    log('recursive watch unavailable here — polling every 2 s');
-    for (;;) {
-      await new Promise((res) => setTimeout(res, interval));
-      if (await isStale(root, { outFile: out })) await rebuild();
-    }
+    await new Promise((resolve) => {
+      w.on('error', (e) => { failed = true; log(`watch error: ${e.message}`); resolve(); });
+      process.on('SIGINT', () => { w.close(); resolve(); });
+    });
+    if (!failed) return;
+  } catch { failed = true; }
+  log('recursive watch unavailable here — polling every 2 s');
+  for (;;) {
+    await new Promise((res) => setTimeout(res, interval));
+    try { if (await isStale(root, { outFile: out })) await rebuild(); } catch (e) { log(`bearings: ${e.message}`); return; }
   }
 }

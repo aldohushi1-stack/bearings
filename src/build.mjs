@@ -30,7 +30,8 @@ async function readBounded(abs, limit) {
     const len = Math.min(st.size, limit);
     const buf = Buffer.alloc(len);
     await h.read(buf, 0, len, 0);
-    return buf.toString('utf8');
+    const text = buf.toString('utf8');
+    return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
   } finally { await h.close(); }
 }
 
@@ -75,14 +76,14 @@ export async function isStale(root, { outFile = DEFAULT_OUT } = {}) {
  * Build and write the map. Returns `{ markdown, estimate, dropped, changed, outPath, model }`.
  * A build whose fingerprint, budget and version match the last one is skipped (`changed: false`).
  */
-export async function build(root, { budget = DEFAULT_BUDGET, out = DEFAULT_OUT, json = false, force = false } = {}) {
+export async function build(root, { budget = DEFAULT_BUDGET, out = DEFAULT_OUT, json = false, force = false, allowUnwritable = false } = {}) {
   root = path.resolve(root);
   let st;
   try { st = await fs.stat(root); } catch { throw new Error(`no such folder: ${root}`); }
   if (!st.isDirectory()) throw new Error(`not a folder: ${root}`);
   const version = await packageVersion();
-  const outFile = out.replace(/\\/g, '/');
-  const outPath = path.join(root, outFile);
+  const outPath = path.isAbsolute(out) ? path.resolve(out) : path.join(root, out);
+  const outFile = path.relative(root, outPath).replace(/\\/g, '/');
   const state = await readState(root);
 
   if (!force && state && state.out === outFile && state.budget === budget && state.version === version) {
@@ -96,15 +97,22 @@ export async function build(root, { budget = DEFAULT_BUDGET, out = DEFAULT_OUT, 
 
   const model = await buildModel(root, { outFile });
   const { markdown, estimate, dropped } = render(model, { budget, version });
-  await fs.mkdir(path.dirname(outPath), { recursive: true });
-  await fs.mkdir(path.join(root, STATE_DIR), { recursive: true });
-  await fs.writeFile(outPath, markdown, 'utf8');
-  await fs.writeFile(statePath(root), JSON.stringify({
-    version, fingerprint: model.fingerprint, budget, out: outFile, estimate, dropped, builtAt: new Date().toISOString(),
-  }, null, 2) + '\n', 'utf8');
-  if (json) {
-    const { layout, ...rest } = model;
-    await fs.writeFile(path.join(root, STATE_DIR, 'map.json'), JSON.stringify({ ...rest, layout, modules: model.modules.map(({ path: p, exports, score, importedBy: ib }) => ({ path: p, exports, score, importedBy: ib })) }, null, 2) + '\n', 'utf8');
+  // Writes are best-effort: a read-only checkout still gets its map (the hook prints it either way).
+  let written = true;
+  try {
+    await fs.mkdir(path.dirname(outPath), { recursive: true });
+    await fs.mkdir(path.join(root, STATE_DIR), { recursive: true });
+    await fs.writeFile(outPath, markdown, 'utf8');
+    await fs.writeFile(statePath(root), JSON.stringify({
+      version, fingerprint: model.fingerprint, budget, out: outFile, estimate, dropped, builtAt: new Date().toISOString(),
+    }, null, 2) + '\n', 'utf8');
+    if (json) {
+      const { layout, ...rest } = model;
+      await fs.writeFile(path.join(root, STATE_DIR, 'map.json'), JSON.stringify({ ...rest, layout, modules: model.modules.map(({ path: p, exports, score, importedBy: ib }) => ({ path: p, exports, score, importedBy: ib })) }, null, 2) + '\n', 'utf8');
+    }
+  } catch (e) {
+    if (!allowUnwritable) throw e;
+    written = false;
   }
-  return { markdown, estimate, dropped, changed: true, outPath, model };
+  return { markdown, estimate, dropped, changed: true, written, outPath, model };
 }

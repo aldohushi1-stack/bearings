@@ -2,7 +2,7 @@
 
 Get your bearings. A small, budgeted orientation map of any folder, handed to your coding agent at session start.
 
-**Kind:** node-cli (Node CLI) · **Languages:** JavaScript (34), Markdown (14), JSON (10), Python (5) · **Package manager:** npm · **Modules:** ESM · **License:** MIT · **Branch:** main · **Files:** 84
+**Kind:** node-cli (Node CLI) · **Languages:** JavaScript (35), Markdown (14), JSON (10), Python (5) · **Package manager:** npm · **Modules:** ESM · **License:** MIT · **Branch:** main · **Files:** 85
 
 ## Run & test
 - `npm test` — node --test test/*.test.mjs
@@ -19,8 +19,8 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - 1 .env file in the tree (not read)
 
 ## Layout
-- test/ — 51 files · mjs · tests
-  - fixtures/ (42) · 9 files directly
+- test/ — 52 files · mjs · tests
+  - fixtures/ (42) · 10 files directly
 - src/ — 16 files · mjs · source
   - extract/ (5) · 11 files directly
 - docs/ — 3 files · md · docs
@@ -33,8 +33,8 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 
 ## Modules
 - src/build.mjs — DEFAULT_BUDGET, DEFAULT_OUT, packageVersion, buildModel, statePath, readState, isStale, build
-- bin/bearings.mjs — (entry script)
 - src/scan.mjs — DEFAULT_IGNORE_DIRS, extOf, isSensitiveName, compileIgnore, matchesIgnore, scan, filesOf
+- bin/bearings.mjs — (entry script)
 - src/cli.mjs — main
 - src/hook.mjs — HOOK_MATCHER, DEFAULT_COMMAND, HOOK_TIMEOUT, isOurs, findOurHooks, buildCommand, installHook, uninstallHook, hookOutput
 - src/tokens.mjs — estimateTokens
@@ -44,15 +44,15 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - src/rank.mjs — rankModules
 - src/render.mjs — render
 - src/extract/index.mjs — languageOf, extractFile
+- src/extract/js.mjs — extractJs
+- src/extract/rust.mjs — extractRust
 - src/watch.mjs — watch
 - src/extract/go.mjs — extractGo
-- src/extract/js.mjs — extractJs
 - src/extract/python.mjs — extractPython
-- src/extract/rust.mjs — extractRust
-- +24 more source files
+- +25 more source files
 
 ## Recent
-- src/render.mjs, test/hook.test.mjs, src/cli.mjs, .gitattributes, docs/POST.md
+- README.md, DESIGN.md, CHANGELOG.md, test/regressions.test.mjs, src/watch.mjs
 
 ---
-bearings 0.1.0 · fingerprint 44a54d94 · budget 1500 · est. 600 tokens
+bearings 0.1.0 · fingerprint d53c059e · budget 1500 · est. 600 tokens

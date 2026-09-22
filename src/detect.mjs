@@ -490,7 +490,7 @@ export async function detect(root, scanResult) {
   model.assetCount = files.filter((f) => f.asset).length;
   model.envFileCount = files.filter((f) => f.sensitive && /(^|\/)\.env(\.|$)/i.test(f.path)).length;
   model.sensitiveCount = files.filter((f) => f.sensitive).length - model.envFileCount;
-  model.recent = [...files].filter((f) => !f.sensitive && !f.lockfile).sort((a, b) => b.mtimeMs - a.mtimeMs || a.path.localeCompare(b.path)).slice(0, 5).map((f) => f.path);
+  model.recent = [...files].filter((f) => !f.sensitive && !f.lockfile && !f.path.startsWith('.claude/')).sort((a, b) => b.mtimeMs - a.mtimeMs || a.path.localeCompare(b.path)).slice(0, 5).map((f) => f.path);
   model.gitBranch = null;
   try {
     const head = await fs.readFile(path.join(root, '.git', 'HEAD'), 'utf8');

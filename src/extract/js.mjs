@@ -41,8 +41,9 @@ export function extractJs(text) {
 
   const imps = [];
   const pushImp = (index, spec) => imps.push({ index, spec });
-  for (const m of src.matchAll(/import\s+(?:type\s+)?(?:[^'";]*?\s+from\s+)?['"]([^'"]+)['"]/g)) pushImp(m.index, m[1]);
-  for (const m of src.matchAll(/export\s+(?:\*|\{[^}]*\})\s*from\s+['"]([^'"]+)['"]/g)) pushImp(m.index, m[1]);
+  // Linear patterns only — the obvious `import … from '…'` regex backtracks cubically on long whitespace runs.
+  for (const m of src.matchAll(/\bimport\s*['"]([^'"\n]+)['"]/g)) pushImp(m.index, m[1]); // side-effect imports
+  for (const m of src.matchAll(/\bfrom\s*['"]([^'"\n]+)['"]/g)) pushImp(m.index, m[1]); // import … from, export … from
   for (const m of src.matchAll(/import\(\s*['"]([^'"]+)['"]\s*\)/g)) pushImp(m.index, m[1]);
   for (const m of src.matchAll(/require\(\s*['"]([^'"]+)['"]\s*\)/g)) pushImp(m.index, m[1]);
   imps.sort((a, b) => a.index - b.index);
