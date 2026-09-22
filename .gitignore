@@ -3,3 +3,4 @@
 *.tgz
 /.claude/settings.local.json
 /docs/private/
+/bearings.bundle

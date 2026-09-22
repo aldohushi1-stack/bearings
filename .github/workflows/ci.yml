@@ -30,6 +30,6 @@ jobs:
       - name: Hook emit smoke test
         shell: bash
         run: |
-          echo '{"session_id":"ci","cwd":"'"$PWD"'","hook_event_name":"SessionStart","source":"startup"}' | node bin/bearings.mjs emit | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const o=JSON.parse(d);if(!o.hookSpecificOutput.additionalContext.startsWith('# get-bearings'))process.exit(1);console.log('emit ok,',o.hookSpecificOutput.additionalContext.length,'chars')})"
+          node -e "process.stdout.write(JSON.stringify({session_id:'ci',cwd:process.cwd(),hook_event_name:'SessionStart',source:'startup'}))" | node bin/bearings.mjs emit | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const o=JSON.parse(d);if(!o.hookSpecificOutput.additionalContext.startsWith('# get-bearings'))process.exit(1);console.log('emit ok,',o.hookSpecificOutput.additionalContext.length,'chars')})"
       - name: Pack
         run: npm pack --dry-run

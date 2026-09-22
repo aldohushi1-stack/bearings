@@ -57,12 +57,41 @@ What it says, plainly:
 
 ## The after arm
 
-Install the hook in the two folders that get the most sessions (`my-agent`, `sesh`), work normally for ten sessions, then:
+**Hook installed 22 September 2026** in `sesh` and `my-agent`, via `bearings init` with
+`--command 'node "C:/Users/Aldo/Desktop/sesh/bearings/bin/bearings.mjs"'` — the package is not
+published yet, so the default `npx -y get-bearings emit` would have failed silently on every
+session start. Maps: sesh 1,262 tokens, my-agent 424 tokens. Build time 2.3 s and 1.2 s cold,
+against a 30 s hook timeout.
+
+Work normally for ten sessions, then:
 
 ```
 node scripts/startup-tax.mjs %USERPROFILE%\.claude\projects --since 2026-09-23 --per-session
 ```
 
-or double-click `scripts\measure.cmd`. Compare `orientation-only turns per session` and `orientation calls per session` against this file. If the after number is not lower, say so; that is a finding too.
+or double-click `scripts\measure.cmd`.
+
+### Compare against these numbers, not the table at the top of this file
+
+The table above was computed from the 28-session *copy* in `sesh\projects`. The after arm reads
+the live `~/.claude/projects`, which by 22 Sep held **49 sessions with tool calls** — and the
+per-session orientation rates there are roughly double the copy's. Comparing the after arm to the
+top of this file would flatter the result. The honest before arm is every live session through
+22 Sep 2026, frozen in `docs/private/before-arm-2026-09-22.{md,json}` (gitignored):
+
+| scope | sessions | orientation calls / session | orientation-only turns / session |
+|---|---|---|---|
+| all projects | 49 | median 2 · mean 2.22 | median 1 · mean 1.80 |
+| **sesh + my-agent** (the hooked pair) | 41 | **median 2 · mean 2.27** | **median 1 · mean 1.80** |
+| sesh alone | 21 | median 2 · mean 3.57 | median 2 · mean 2.81 |
+| my-agent alone | 20 | median 0 · mean 0.90 | median 0 · mean 0.75 |
+
+Across the whole live corpus: 109 orientation calls, **88 of 5,690 turns did nothing but orient**
+($17.80), against $3.89 to carry the map — net $13.91, where the copied 28-session corpus showed a
+$0.09 wash. The bolded row is the one to beat. Note `my-agent` starts at a median of 0, so there
+is nothing there to remove; `sesh` carries essentially all the headroom, and a combined number
+that barely moves may only mean the two were averaged together.
+
+If the after number is not lower, say so; that is a finding too.
 
 To get the number that matters — the one for codebases the agent did not write — run the same protocol on a repository you have never opened with Claude before: clone something mid-sized (express, flask, a client project), run five sessions without the hook and five with, same task shape ("explain how X works", "add a small feature").

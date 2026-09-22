@@ -30,7 +30,7 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - bin/ — 1 file · mjs · scripts
 - hooks/ — 1 file · json
 - 8 files at the root
-- Skipped: .git · nested dist, node_modules
+- Skipped: .git · nested node_modules
 
 ## Modules
 - src/build.mjs — DEFAULT_BUDGET, DEFAULT_OUT, packageVersion, buildModel, statePath, readState, isStale, build
@@ -53,7 +53,7 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - +27 more source files
 
 ## Recent
-- docs/POST.md, CHANGELOG.md, README.md, docs/MEASURING.md, scripts/measure.cmd
+- .gitignore, .github/workflows/ci.yml, docs/baseline-2026-09.md, CHANGELOG.md, README.md
 
 ---
-bearings 0.1.0 · fingerprint f837d2e5 · budget 1500 · est. 611 tokens
+bearings 0.1.0 · fingerprint 800aca29 · budget 1500 · est. 612 tokens
