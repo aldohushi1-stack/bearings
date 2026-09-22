@@ -54,7 +54,7 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - +28 more source files
 
 ## Recent
-- .github/workflows/ci.yml, CHANGELOG.md, DESIGN.md, README.md, src/build.mjs
+- .claude-plugin/marketplace.json, .claude-plugin/plugin.json, CHANGELOG.md, DESIGN.md, docs/POST.md
 
 ---
-bearings 0.2.0 · fingerprint 621cadac · budget 1500 · est. 620 tokens
+bearings 0.2.0 · fingerprint 621cadac · budget 1500 · est. 626 tokens
