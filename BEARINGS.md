@@ -54,7 +54,7 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - +28 more source files
 
 ## Recent
-- CHANGELOG.md, DESIGN.md, src/detect.mjs, src/git.mjs, test/git.test.mjs
+- CLAUDE.md, CHANGELOG.md, DESIGN.md, src/detect.mjs, src/git.mjs
 
 ---
-bearings 0.1.0 · fingerprint daf650fa · budget 1500 · est. 619 tokens
+bearings 0.1.0 · fingerprint daf650fa · budget 1500 · est. 616 tokens
