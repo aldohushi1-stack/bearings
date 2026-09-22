@@ -53,7 +53,7 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - +27 more source files
 
 ## Recent
-- .gitignore, .github/workflows/ci.yml, docs/baseline-2026-09.md, CHANGELOG.md, README.md
+- docs/baseline-2026-09.md, .gitignore, .github/workflows/ci.yml, CHANGELOG.md, README.md
 
 ---
-bearings 0.1.0 · fingerprint 800aca29 · budget 1500 · est. 612 tokens
+bearings 0.1.0 · fingerprint f1102abd · budget 1500 · est. 612 tokens
