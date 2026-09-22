@@ -2,7 +2,7 @@
 
 *Get your bearings. A small, budgeted orientation map of any folder, handed to your coding agent at session start.*
 
-Version 0.1.0 · September 2026 · Aldo Hushi
+Version 0.2.0 · September 2026 · Aldo Hushi
 
 ## 1. The problem
 
@@ -39,7 +39,7 @@ Sections, in priority order. When the budget is tight the renderer degrades from
 | 5 | **Layout** — top-level directories with file counts, dominant extension, purpose label; depth 2 for the largest | walk | degrades to depth 1 |
 | 6 | **Modules** — top-ranked source files, one line each: path and exported names | extractors + ranker | first to go |
 | 7 | **Recent** — five files from the newest commits, current git branch (both read from `.git` directly, no subprocess); mtimes only when there is no repository | `.git` objects, `.git/HEAD`, mtimes | dropped before Layout |
-| 8 | **Footer** — `bearings 0.1.0 · fingerprint ab12cd34 · budget 1500 · est. 1180 tokens` | — | yes |
+| 8 | **Footer** — `bearings 0.2.0 · fingerprint ab12cd34 · budget 1500 · est. 1180 tokens` | — | yes |
 
 The Markdown is written for two readers: an agent that wants facts in the first 200 tokens, and a human skimming the repo. No timestamps in the body, so a rebuild with no change is byte-identical and the file can be committed without churn.
 

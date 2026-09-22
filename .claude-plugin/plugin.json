@@ -1,6 +1,6 @@
 {
   "name": "bearings",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Get your bearings: a small orientation map of the project (what it is, how to run and test it, where things live, the rules) added to context at every session start, resume, clear and compact.",
   "author": { "name": "Aldo Hushi", "email": "aldohushi1@gmail.com" },
   "homepage": "https://github.com/aldohushi1-stack/bearings",

@@ -1,12 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-09-23
 
-- **The fingerprint is over file contents, not mtimes.** A clone or a checkout restamps mtimes, so the same tree hashed differently on every machine: the map's footer changed without the project changing, and `check` could only say "stale" on a fresh clone. Assets and credential-looking files still contribute path and size only (`.env` is never read), and nothing is hashed past 256 KB — the ceiling the map itself reads at — so the fast path stays well ahead of a full rebuild.
-- **`check` is now a real CI gate.** With no `.bearings/state.json` — the normal state of a fresh clone, since it is gitignored — it falls back to the fingerprint the committed map carries in its own footer.
+Determinism: the same commit now produces the same map on every machine, and `check` means something in CI.
 
 - **Recent comes from the commit history when there is a repository.** It was the five newest mtimes, which a clone or checkout restamps, so the same commit rendered a different map on every machine. `src/git.mjs` reads `.git` directly — loose objects and packfiles with delta chains — with no subprocess and no dependency, and falls back to mtimes when there is no repository or no commit yet.
+- **The fingerprint is over file contents, not mtimes.** Same cause, same cure: the footer changed without the project changing. Assets and credential-looking files still contribute path and size only (`.env` is never read), and nothing is hashed past 256 KB — the ceiling the map itself reads at — so the fast path stays well ahead of a full rebuild.
+- **`check` is now a real CI gate.** With no `.bearings/state.json` — the normal state of a fresh clone, since it is gitignored — it falls back to the fingerprint the committed map carries in its own footer. CI asserts the committed map is current before rebuilding it.
 - CI's hook smoke test built its payload with `$PWD`, which under `shell: bash` on windows-latest is a POSIX path Node cannot resolve; `emit` swallowed the error and the piped `JSON.parse` died. The payload is built in Node now.
+- 74 tests (up from 62), still zero dependencies, Node ≥ 20.
 
 ## 0.1.0 — 2026-09-22
 

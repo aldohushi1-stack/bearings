@@ -1,4 +1,4 @@
-# Launch copy — Bearings 0.1.0
+# Launch copy — Bearings 0.2.0
 
 No hashtags (they've stopped working on LinkedIn); keywords go in the opening line.
 

@@ -1,6 +1,6 @@
 {
   "name": "get-bearings",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Get your bearings. A small, budgeted orientation map of any folder, handed to your coding agent at session start.",
   "type": "module",
   "bin": {
