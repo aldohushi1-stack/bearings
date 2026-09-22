@@ -1,0 +1,4 @@
+dist/
+*.log
+/secret-notes.md
+!keep.log

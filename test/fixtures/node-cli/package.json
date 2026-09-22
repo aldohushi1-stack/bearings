@@ -1,0 +1,16 @@
+{
+  "name": "widget-cli",
+  "version": "1.2.3",
+  "description": "Counts widgets in a folder and prints a report.",
+  "type": "module",
+  "bin": { "widget": "bin/widget.mjs" },
+  "main": "src/index.mjs",
+  "scripts": {
+    "test": "node --test",
+    "lint": "eslint .",
+    "build": "node scripts/build.mjs",
+    "start": "node bin/widget.mjs"
+  },
+  "devDependencies": { "eslint": "^9.0.0", "prettier": "^3.0.0" },
+  "license": "MIT"
+}

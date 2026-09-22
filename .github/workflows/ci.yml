@@ -1,0 +1,35 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+      - name: Self-map
+        run: |
+          node bin/bearings.mjs build . --print --force
+          node bin/bearings.mjs check .
+      - name: Hook emit smoke test
+        shell: bash
+        run: |
+          echo '{"session_id":"ci","cwd":"'"$PWD"'","hook_event_name":"SessionStart","source":"startup"}' | node bin/bearings.mjs emit | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const o=JSON.parse(d);if(!o.hookSpecificOutput.additionalContext.startsWith('# get-bearings'))process.exit(1);console.log('emit ok,',o.hookSpecificOutput.additionalContext.length,'chars')})"
+      - name: Pack
+        run: npm pack --dry-run

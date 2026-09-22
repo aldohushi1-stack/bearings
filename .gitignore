@@ -1,0 +1,4 @@
+/node_modules/
+/.bearings/
+*.tgz
+/.claude/settings.local.json

@@ -1,0 +1,49 @@
+{
+  "name": "get-bearings",
+  "version": "0.1.0",
+  "description": "Get your bearings. A small, budgeted orientation map of any folder, handed to your coding agent at session start.",
+  "type": "module",
+  "bin": {
+    "bearings": "bin/bearings.mjs"
+  },
+  "main": "src/build.mjs",
+  "exports": {
+    ".": "./src/build.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "self": "node bin/bearings.mjs build . --print",
+    "check": "node bin/bearings.mjs check ."
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "claude-code",
+    "hooks",
+    "repo-map",
+    "codebase-map",
+    "coding-agent",
+    "context",
+    "orientation",
+    "cli"
+  ],
+  "author": "Aldo Hushi <aldohushi1@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aldohushi1-stack/bearings.git"
+  },
+  "homepage": "https://github.com/aldohushi1-stack/bearings#readme",
+  "bugs": {
+    "url": "https://github.com/aldohushi1-stack/bearings/issues"
+  }
+}
