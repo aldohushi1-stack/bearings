@@ -148,7 +148,7 @@ Full design notes, including the degradation order and the prior-art comparison,
 
 ## Measuring it
 
-The claim is that Bearings cuts the startup tax. Glassbox measures exactly that: the tool calls and dollars a session spends before its first write. The protocol is in [docs/MEASURING.md](docs/MEASURING.md): ten sessions without the hook, ten with, same project, compare. The number is the story, not the feature.
+The claim is that Bearings cuts the startup tax, so it ships with the ruler: `scripts/startup-tax.mjs` reads your Claude Code transcripts and counts the turns that did nothing but orient, what they cost, and what carrying the map would have cost instead. First real result, on 28 of the author's own sessions: 30 orientation-only turns out of 2,635 (1.1 %, $1.51) against $1.42 to carry the map — a wash in dollars, one round-trip saved per session. Those were sessions in folders the agent had written itself; the number for codebases you did not write is the one worth having, and [docs/MEASURING.md](docs/MEASURING.md) is the protocol for getting it. Run it before you believe anyone's percentage, including this README's.
 
 ## Contributing
 

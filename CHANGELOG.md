@@ -12,4 +12,5 @@ First release.
 - `bearings check` — CI gate; `print`, `watch`, `--json`.
 - Claude Code plugin (`/plugin marketplace add aldohushi1-stack/bearings`, `/plugin install bearings@get-bearings`).
 - Honours `.gitignore` (root + nested) and `.bearingsignore`; breadth-first walk with 20,000-entry / depth-8 caps; never reads `.env` or credential-looking files.
-- 60 tests (including regressions from an adversarial review: linear import regexes, gitignore character classes and BOMs, read-only folders, stdin held open, no home directory), zero dependencies, Node ≥ 20.
+- `scripts/startup-tax.mjs` — measures the startup tax from Claude Code transcripts (orientation calls, orientation-only turns, cost before first write, cost of carrying the map); `scripts/measure.cmd` for Windows; baseline on 28 real sessions in `docs/baseline-2026-09.md`.
+- 62 tests (including regressions from an adversarial review: linear import regexes, gitignore character classes and BOMs, read-only folders, stdin held open, no home directory), zero dependencies, Node ≥ 20.

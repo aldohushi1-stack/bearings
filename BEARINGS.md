@@ -2,7 +2,7 @@
 
 Get your bearings. A small, budgeted orientation map of any folder, handed to your coding agent at session start.
 
-**Kind:** node-cli (Node CLI) · **Languages:** JavaScript (35), Markdown (14), JSON (10), Python (5) · **Package manager:** npm · **Modules:** ESM · **License:** MIT · **Branch:** main · **Files:** 85
+**Kind:** node-cli (Node CLI) · **Languages:** JavaScript (37), Markdown (15), JSON (10), Python (5) · **Package manager:** npm · **Modules:** ESM · **License:** MIT · **Branch:** main · **Files:** 89
 
 ## Run & test
 - `npm test` — node --test test/*.test.mjs
@@ -19,13 +19,14 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - 1 .env file in the tree (not read)
 
 ## Layout
-- test/ — 52 files · mjs · tests
-  - fixtures/ (42) · 10 files directly
+- test/ — 53 files · mjs · tests
+  - fixtures/ (42) · 11 files directly
 - src/ — 16 files · mjs · source
   - extract/ (5) · 11 files directly
-- docs/ — 3 files · md · docs
+- docs/ — 4 files · md · docs
 - .claude-plugin/ — 2 files · json
 - .github/ — 2 files · yml · config
+- scripts/ — 2 files · cmd · scripts
 - bin/ — 1 file · mjs · scripts
 - hooks/ — 1 file · json
 - 8 files at the root
@@ -49,10 +50,10 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - src/watch.mjs — watch
 - src/extract/go.mjs — extractGo
 - src/extract/python.mjs — extractPython
-- +25 more source files
+- +27 more source files
 
 ## Recent
-- README.md, DESIGN.md, CHANGELOG.md, test/regressions.test.mjs, src/watch.mjs
+- docs/POST.md, CHANGELOG.md, README.md, docs/MEASURING.md, scripts/measure.cmd
 
 ---
-bearings 0.1.0 · fingerprint d53c059e · budget 1500 · est. 600 tokens
+bearings 0.1.0 · fingerprint f837d2e5 · budget 1500 · est. 611 tokens

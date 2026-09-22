@@ -10,6 +10,22 @@ Bearings claims one thing: an agent that starts with the map in context spends f
 - `cost before first write` — the dollar cost of those turns at list price.
 - `turns to first write` — how many assistant turns it took.
 
+## The script
+
+`scripts/startup-tax.mjs` does the counting. Zero dependencies, reads only.
+
+```
+node scripts/startup-tax.mjs ~/.claude/projects            # every session
+node scripts/startup-tax.mjs ~/.claude/projects --since 2026-09-23 --per-session
+node scripts/startup-tax.mjs ~/.claude/projects --format json > startup-tax.json
+```
+
+It reports, per session and in aggregate: exploratory calls before the first write; how many of those are *orientation* calls — the ones a map answers (directory listings, manifests, README, rule files, git status/log, toolchain versions, scoped to the project folder); turns, tokens and dollars before the first write; orientation calls and orientation-only turns across the whole session; the estimated cost of carrying a 1,500-token map through those same sessions; and what kept getting read. Costs use the same list-price card as Glassbox and count each streamed turn once. On Windows, `scripts\measure.cmd` runs it and writes the report into `docs\private\`.
+
+## Baseline: 28 real sessions, before the hook
+
+Run on Aldo's own Claude Code transcripts (Jul–Sep 2026, 2,635 turns, $287.59): **30 turns did nothing but orient — 1.1 % of turns, $1.51 — and carrying the map would have cost $1.42.** In dollars it is a wash on that corpus; the gain is one fewer round-trip per session. Those sessions are mostly new builds and research in folders the agent wrote itself, so the tax was always going to be small there. The full report and the interpretation are in [baseline-2026-09.md](baseline-2026-09.md). The number that matters — for codebases the agent did not write — is still to be measured, and the protocol below is how.
+
 ## Protocol
 
 1. Pick one real project you work on daily and one repeatable task shape — "fix a bug you describe in one line", "add a small feature", "explain how X works". Vary the task, keep the shape.
@@ -26,7 +42,7 @@ Bearings claims one thing: an agent that starts with the map in context spends f
 
 ## What to expect
 
-On a mid-sized Node or Python project the baseline is typically 8–20 exploratory calls and 2–4 turns before the first write. With the map in context, a well-behaved agent goes to the right file in 1–3 calls. The difference in dollars is small per session and large per month; the difference in *turns* is what you feel.
+Honestly: less than the pitch. On the one corpus measured so far the dollars were a wash and the gain was one round-trip per session. On an unfamiliar, mid-sized codebase the first few turns of a session are usually `ls`, the README and the manifest, so the expectation there is 2–5 orientation calls and one or two turns saved per session — again, felt in latency more than in money. If your number is bigger, that's a real result; if it isn't, the script will say so.
 
 ## Report it
 
