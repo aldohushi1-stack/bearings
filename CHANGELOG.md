@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **Recent comes from the commit history when there is a repository.** It was the five newest mtimes, which a clone or checkout restamps, so the same commit rendered a different map on every machine. `src/git.mjs` reads `.git` directly — loose objects and packfiles with delta chains — with no subprocess and no dependency, and falls back to mtimes when there is no repository or no commit yet.
+- CI's hook smoke test built its payload with `$PWD`, which under `shell: bash` on windows-latest is a POSIX path Node cannot resolve; `emit` swallowed the error and the piped `JSON.parse` died. The payload is built in Node now.
+
 ## 0.1.0 — 2026-09-22
 
 First release.

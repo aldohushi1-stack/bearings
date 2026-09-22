@@ -2,7 +2,7 @@
 
 Get your bearings. A small, budgeted orientation map of any folder, handed to your coding agent at session start.
 
-**Kind:** node-cli (Node CLI) · **Languages:** JavaScript (37), Markdown (15), JSON (10), Python (5) · **Package manager:** npm · **Modules:** ESM · **License:** MIT · **Branch:** main · **Files:** 89
+**Kind:** node-cli (Node CLI) · **Languages:** JavaScript (39), Markdown (15), JSON (10), Python (5) · **Package manager:** npm · **Modules:** ESM · **License:** MIT · **Branch:** main · **Files:** 91
 
 ## Run & test
 - `npm test` — node --test test/*.test.mjs
@@ -19,10 +19,10 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - 1 .env file in the tree (not read)
 
 ## Layout
-- test/ — 53 files · mjs · tests
-  - fixtures/ (42) · 11 files directly
-- src/ — 16 files · mjs · source
-  - extract/ (5) · 11 files directly
+- test/ — 54 files · mjs · tests
+  - fixtures/ (42) · 12 files directly
+- src/ — 17 files · mjs · source
+  - extract/ (5) · 12 files directly
 - docs/ — 4 files · md · docs
 - .claude-plugin/ — 2 files · json
 - .github/ — 2 files · yml · config
@@ -38,22 +38,23 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - bin/bearings.mjs — (entry script)
 - src/cli.mjs — main
 - src/hook.mjs — HOOK_MATCHER, DEFAULT_COMMAND, HOOK_TIMEOUT, isOurs, findOurHooks, buildCommand, installHook, uninstallHook, hookOutput
-- src/tokens.mjs — estimateTokens
 - src/detect.mjs — detect
+- src/render.mjs — render
+- src/tokens.mjs — estimateTokens
 - src/fingerprint.mjs — fingerprint
+- src/git.mjs — gitDir, recentFromGit
 - src/graph.mjs — resolveImport, importedBy
 - src/rank.mjs — rankModules
-- src/render.mjs — render
 - src/extract/index.mjs — languageOf, extractFile
 - src/extract/js.mjs — extractJs
 - src/extract/rust.mjs — extractRust
 - src/watch.mjs — watch
 - src/extract/go.mjs — extractGo
 - src/extract/python.mjs — extractPython
-- +27 more source files
+- +28 more source files
 
 ## Recent
-- docs/baseline-2026-09.md, .gitignore, .github/workflows/ci.yml, CHANGELOG.md, README.md
+- .github/workflows/ci.yml, .gitignore, docs/baseline-2026-09.md, CHANGELOG.md, README.md
 
 ---
-bearings 0.1.0 · fingerprint f1102abd · budget 1500 · est. 612 tokens
+bearings 0.1.0 · fingerprint ec24c933 · budget 1500 · est. 623 tokens

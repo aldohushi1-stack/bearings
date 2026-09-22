@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { recentFromGit } from './git.mjs';
 import { filesOf } from './scan.mjs';
 
 const MAX_READ = 256 * 1024;
@@ -490,7 +491,15 @@ export async function detect(root, scanResult) {
   model.assetCount = files.filter((f) => f.asset).length;
   model.envFileCount = files.filter((f) => f.sensitive && /(^|\/)\.env(\.|$)/i.test(f.path)).length;
   model.sensitiveCount = files.filter((f) => f.sensitive).length - model.envFileCount;
-  model.recent = [...files].filter((f) => !f.sensitive && !f.lockfile && !f.path.startsWith('.claude/')).sort((a, b) => b.mtimeMs - a.mtimeMs || a.path.localeCompare(b.path)).slice(0, 5).map((f) => f.path);
+  const listable = files.filter((f) => !f.sensitive && !f.lockfile && !f.path.startsWith('.claude/'));
+  // Prefer the commit history. mtimes are not a property of the tree — clone, checkout and merge
+  // restamp them — so ranking by mtime made the map differ between checkouts of the same commit
+  // and `bearings check` fail on a pristine clone. Git's answer is the same for everyone.
+  const listablePaths = new Set(listable.map((f) => f.path));
+  const fromGit = (await recentFromGit(root, { limit: 20 }) || []).filter((rel) => listablePaths.has(rel)).slice(0, 5);
+  model.recentSource = fromGit.length ? 'git' : 'mtime';
+  model.recent = fromGit.length ? fromGit
+    : [...listable].sort((a, b) => b.mtimeMs - a.mtimeMs || a.path.localeCompare(b.path)).slice(0, 5).map((f) => f.path);
   model.gitBranch = null;
   try {
     const head = await fs.readFile(path.join(root, '.git', 'HEAD'), 'utf8');

@@ -23,7 +23,7 @@ Zero dependencies, Node ≥ 20, one command to install: `npx get-bearings init`.
 
 - Not a symbol index, call graph or search tool. If you need "who calls `parseOrder`", use agentmap or atlas; Bearings will name the module and stop.
 - Not an MCP server (v0.1). The map goes into context; the agent does not have to call anything.
-- Never executes project code, never runs `git`, never touches the network. It reads file names, sizes, mtimes, and the text of a bounded set of small source and manifest files.
+- Never executes project code, never runs `git` (it reads `.git` itself), never touches the network. It reads file names, sizes, mtimes, the commit history from `.git`, and the text of a bounded set of small source and manifest files.
 - Never prints file contents. It prints names: scripts, exported symbols, config keys, README's first paragraph.
 
 ## 4. The map
@@ -38,7 +38,7 @@ Sections, in priority order. When the budget is tight the renderer degrades from
 | 4 | **Rules & conventions** — CLAUDE.md, AGENTS.md, `.cursor/rules`, CONTRIBUTING, `.editorconfig` indent, TS strict, license, `.env` (keys of `.env.example` only) | presence + tiny reads | yes |
 | 5 | **Layout** — top-level directories with file counts, dominant extension, purpose label; depth 2 for the largest | walk | degrades to depth 1 |
 | 6 | **Modules** — top-ranked source files, one line each: path and exported names | extractors + ranker | first to go |
-| 7 | **Recent** — five most recently modified files, current git branch (read from `.git/HEAD`, no subprocess) | mtimes, `.git/HEAD` | dropped before Layout |
+| 7 | **Recent** — five files from the newest commits, current git branch (both read from `.git` directly, no subprocess); mtimes only when there is no repository | `.git` objects, `.git/HEAD`, mtimes | dropped before Layout |
 | 8 | **Footer** — `bearings 0.1.0 · fingerprint ab12cd34 · budget 1500 · est. 1180 tokens` | — | yes |
 
 The Markdown is written for two readers: an agent that wants facts in the first 200 tokens, and a human skimming the repo. No timestamps in the body, so a rebuild with no change is byte-identical and the file can be committed without churn.
@@ -128,7 +128,7 @@ Other agents: `bearings print` pipes into anything; the README shows the one-lin
 
 ## 12. Tests
 
-`node --test`, zero dependencies. Fixtures are small real-shaped projects under `test/fixtures/` (`node-cli`, `python-pkg`, `single-html`, `folder-of-projects`, `monorepo`) plus temp dirs built in-test for mtime and ignore cases.
+`node --test`, zero dependencies. Fixtures are small real-shaped projects under `test/fixtures/` (`node-cli`, `python-pkg`, `single-html`, `folder-of-projects`, `monorepo`) plus temp dirs built in-test for mtime and ignore cases. `test/git.test.mjs` shells out to real `git` to build repositories to read — the library never does, only the tests.
 
 - scan: default ignores, `.gitignore` forms (including nested files, character classes and a BOM), `.bearingsignore`, depth cap, breadth-first order, forward slashes on every platform, output file and `.bearings/` excluded from the fingerprint.
 - detect: each kind in the table.
@@ -143,7 +143,15 @@ Other agents: `bearings print` pipes into anything; the README shows the one-lin
 
 ### What `check` is for
 
-The fingerprint is mtime-based, so `check` is a local gate (pre-commit, a watcher, "did I forget to rebuild") — not a CI assertion. A fresh clone has new mtimes and no `.bearings/state.json`, so `check` will always say stale there; CI should run `build` and, if it wants a diff, compare everything above the Recent section.
+The fingerprint is mtime-based, so `check` is a local gate (pre-commit, a watcher, "did I forget to rebuild") — not a CI assertion. A fresh clone has new mtimes and no `.bearings/state.json`, so `check` will always say stale there; CI should run `build` and, if it wants a diff, compare everything above the footer.
+
+### Why Recent comes from git
+
+mtimes are not a property of the tree. A clone, a checkout, a merge or a `git stash pop` restamps them, in whatever order the files happen to be written, so ranking by mtime rendered the *same commit* differently on different machines — a map that churned without the project changing, against the rule that the map stays deterministic.
+
+When a repository is present, `src/git.mjs` walks the first-parent commit chain and diffs each commit's tree against its parent, newest first, until it has five paths. Everyone who checks out that commit gets the same five. Without a repository (or before the first commit) it falls back to mtimes, which is the best available answer there.
+
+It reads `.git` directly rather than shelling out: loose objects and packfiles, including OFS_DELTA and REF_DELTA chains, because a fresh clone keeps everything in a pack — the case that was broken. Object bodies are zlib streams and zlib is stdlib, so this stays zero-dependency and subprocess-free. Every entry point returns null instead of throwing; a map is never worth failing a session for.
 
 ## 13. Prior art
 
