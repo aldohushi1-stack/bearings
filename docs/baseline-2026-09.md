@@ -34,7 +34,7 @@ What kept getting read:
 | pwd | 1 |
 | README.md | 1 |
 | uv | 1 |
-| Glob C:\Users\Aldo\Desktop\roster\**\*deploy* | 1 |
+| Glob <absolute path> | 1 |
 | Glob **/backtalk.json | 1 |
 | Glob **/backtalk/** | 1 |
 | Glob **/backtalk* | 1 |
