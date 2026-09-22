@@ -19,7 +19,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node --test test/*.test.mjs",
+    "test": "node scripts/test.mjs",
     "self": "node bin/bearings.mjs build . --print",
     "check": "node bin/bearings.mjs check ."
   },

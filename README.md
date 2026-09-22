@@ -152,7 +152,7 @@ The claim is that Bearings cuts the startup tax, so it ships with the ruler: `sc
 
 ## Contributing
 
-The two tables contributors most want to extend are `src/detect.mjs` (the kind rules) and `src/extract/` (one file per language — Ruby, PHP, Java, C#, Swift are all one regex-and-a-test away). Run `npm test`; every feature has fixtures under `test/fixtures/`. A PR that adds a language should add a fixture and a `test/extract.test.mjs` case.
+The two tables contributors most want to extend are `src/detect.mjs` (the kind rules) and `src/extract/` (one file per language — Ruby, PHP, Java, C#, Swift are all one regex-and-a-test away). Run `npm test` (it lists `test/*.test.mjs` itself, so it behaves the same on every shell and Node ≥ 20); every feature has fixtures under `test/fixtures/`. A PR that adds a language should add a fixture and a `test/extract.test.mjs` case.
 
 ## Prior art
 

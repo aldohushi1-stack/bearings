@@ -2,10 +2,10 @@
 
 Get your bearings. A small, budgeted orientation map of any folder, handed to your coding agent at session start.
 
-**Kind:** node-cli (Node CLI) · **Languages:** JavaScript (39), Markdown (15), JSON (10), Python (5) · **Package manager:** npm · **Modules:** ESM · **License:** MIT · **Branch:** main · **Files:** 91
+**Kind:** node-cli (Node CLI) · **Languages:** JavaScript (40), Markdown (15), JSON (10), Python (5) · **Package manager:** npm · **Modules:** ESM · **License:** MIT · **Branch:** main · **Files:** 92
 
 ## Run & test
-- `npm test` — node --test test/*.test.mjs
+- `npm test` — node scripts/test.mjs
 - `npm run self` — node bin/bearings.mjs build . --print
 - `npm run check` — node bin/bearings.mjs check .
 - Tests: node:test in test/ · CI: ci.yml, publish.yml
@@ -24,13 +24,13 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - src/ — 17 files · mjs · source
   - extract/ (5) · 12 files directly
 - docs/ — 4 files · md · docs
+- scripts/ — 3 files · mjs · scripts
 - .claude-plugin/ — 2 files · json
 - .github/ — 2 files · yml · config
-- scripts/ — 2 files · cmd · scripts
 - bin/ — 1 file · mjs · scripts
 - hooks/ — 1 file · json
 - 8 files at the root
-- Skipped: .git · nested node_modules
+- Skipped: .git · nested dist, node_modules
 
 ## Modules
 - src/build.mjs — DEFAULT_BUDGET, DEFAULT_OUT, packageVersion, buildModel, statePath, readState, isStale, build
@@ -51,10 +51,10 @@ Get your bearings. A small, budgeted orientation map of any folder, handed to yo
 - src/watch.mjs — watch
 - src/extract/go.mjs — extractGo
 - src/extract/python.mjs — extractPython
-- +28 more source files
+- +29 more source files
 
 ## Recent
-- .claude-plugin/marketplace.json, .claude-plugin/plugin.json, CHANGELOG.md, DESIGN.md, docs/POST.md
+- .claude-plugin/marketplace.json, .claude-plugin/plugin.json, .github/workflows/ci.yml, .gitignore, CHANGELOG.md
 
 ---
-bearings 0.2.0 · fingerprint 621cadac · budget 1500 · est. 626 tokens
+bearings 0.2.0 · fingerprint a4405d03 · budget 1500 · est. 630 tokens

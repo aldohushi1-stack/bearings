@@ -8,6 +8,7 @@ Determinism: the same commit now produces the same map on every machine, and `ch
 - **The fingerprint is over file contents, not mtimes.** Same cause, same cure: the footer changed without the project changing. Assets and credential-looking files still contribute path and size only (`.env` is never read), and nothing is hashed past 256 KB — the ceiling the map itself reads at — so the fast path stays well ahead of a full rebuild.
 - **`check` is now a real CI gate.** With no `.bearings/state.json` — the normal state of a fresh clone, since it is gitignored — it falls back to the fingerprint the committed map carries in its own footer. CI asserts the committed map is current before rebuilding it.
 - CI's hook smoke test built its payload with `$PWD`, which under `shell: bash` on windows-latest is a POSIX path Node cannot resolve; `emit` swallowed the error and the piped `JSON.parse` died. The payload is built in Node now.
+- `npm test` runs through `scripts/test.mjs`, which lists `test/*.test.mjs` itself. Node 20's runner does not expand globs, so on Windows — where the shell doesn't either — `node --test test/*.test.mjs` received the literal string and failed with "Could not find" (CI run #1, windows-latest / Node 20; the other eight jobs passed). Verified under Node 20.20 and 22.
 - 74 tests (up from 62), still zero dependencies, Node ≥ 20.
 
 ## 0.1.0 — 2026-09-22

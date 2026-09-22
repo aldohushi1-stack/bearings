@@ -2,7 +2,7 @@
 
 No hashtags (they've stopped working on LinkedIn); keywords go in the opening line.
 
-Two ways to lead. B is the one that matches the measurements; A is the one that sounds like every other launch.
+Three ways to lead. B is the one that matches the measurements; C is the same truth told to a four-year-old (and reads well aloud for a reel); A is the one that sounds like every other launch.
 
 ## LinkedIn — option B (recommended): the honest number
 
@@ -19,6 +19,28 @@ One command. A ~1,500-token map of the project — what it is, how to run and te
 Every other tool in this space quotes a percentage. This one ships the script that computes yours. Link in the first comment.
 
 *(first comment)* github.com/aldohushi1-stack/bearings · npm: get-bearings · the measurement: docs/MEASURING.md
+
+## LinkedIn — option C: the fridge note (read it aloud, ~60 s)
+
+Claude Code, Codex, Cursor: you know how a robot helper forgets everything when it goes to sleep? Not just what it ate last Thursday. Everything. Where the toys live. Which cupboard has the cups. What the house rules are.
+
+So every morning it wakes up and opens every cupboard, one by one, looking. Open, peek, close. Open, peek, close. Twenty cupboards before it even starts helping. And every cupboard it opens, you pay for.
+
+Bearings is a note on the fridge.
+
+Big letters. "This is a Lego house. The bricks are in the red box. The rules are on the wall. To check it still stands up, push it gently." The robot reads the note first, and walks straight to the red box.
+
+You never write the note. Bearings writes it, and rewrites it when you move the bricks. And the robot forgets a lot: after a nap, after a long day when its head gets full, after you say "start again from the top". The note is there every single time.
+
+One magic word to get it: npx get-bearings init
+
+Now the honest bit, because four-year-olds can tell when you fib. It's not the robot's memory of what it did yesterday. That's the diary, and the diary is called Glassbox. Bearings doesn't remember what you ate last Thursday. It remembers where the kitchen is.
+
+And when I measured it on my own house, the robot was only opening one extra cupboard a morning, because it built the house itself and already knew where everything was. In a house you didn't build, a client's house, a big one with forty rooms, the note on the fridge earns its keep. That's the number I'm going to measure next, and the ruler comes in the box.
+
+Link in the first comment.
+
+*(first comment)* github.com/aldohushi1-stack/bearings · npm: get-bearings · the diary: blueprintau.com/glassbox
 
 ## LinkedIn — option A: the pitch
 

@@ -2,13 +2,11 @@
 
 The first published version is **0.2.0** (0.1.0 was tagged in the changelog but never published). Everything below is Aldo's to run (or Claude via the GitHub web upload page in Chrome, as with Glassbox).
 
-## 1. GitHub
+## 1. GitHub — done 23 Sep 2026
 
-1. Create the public repo **aldohushi1-stack/bearings** (empty, no README — we bring our own).
-2. Upload the tree from `sesh\bearings`. Line endings: the repo is LF everywhere (`.gitattributes` enforces it); if files arrive CRLF from Windows, normalise before uploading.
-3. Upload order if the web uploader is used one directory at a time: `src/` → `bin/` → `hooks/` + `.claude-plugin/` → `test/` → root files → `docs/` → `.github/workflows/` last (workflows can be blocked for automation; upload those by hand if so).
-4. Check Actions → ci is green on the final commit (matrix: 3 OS × Node 20/22/24). The `concurrency` block cancels partial-tree runs from a multi-commit upload.
-5. Settings → General → Features: enable Issues. Settings → Security: enable private vulnerability reporting. Add topics: `claude-code`, `claude-code-hooks`, `repo-map`, `coding-agents`, `context`.
+The repo is live at github.com/aldohushi1-stack/bearings (main + tag v0.2.0, pushed from `sesh\bearings`). Day-to-day: `push.cmd` commits whatever changed in the folder and pushes it. CI run #1 was 8/9 (windows-latest / Node 20 failed on the test glob — fixed by `scripts/test.mjs`); the next push should be 9/9.
+
+Still to do on GitHub, once: Settings → General → Features: enable Issues. Settings → Security: enable private vulnerability reporting. Add topics: `claude-code`, `claude-code-hooks`, `repo-map`, `coding-agents`, `context`.
 
 ## 2. npm (trusted publishing, same pattern as glassbox-trace)
 
@@ -19,6 +17,8 @@ The first published version is **0.2.0** (0.1.0 was tagged in the changelog but 
    npm login
    npm publish --access public
    ```
+
+   or double-click `publish.cmd`, which does login (if needed) → `npm test` → `npm pack --dry-run` → `npm publish --access public` → `npx get-bearings@0.2.0 --version`, using `call npm` so the window stays open.
 
    (The name `get-bearings` was still free on 23 Sep 2026; `bearings` is taken.)
 2. Then on npmjs.com → get-bearings → Settings → Publishing access → **Trusted publisher**: GitHub, owner `aldohushi1-stack`, repo `bearings`, workflow `publish.yml`. Tick "Allow npm publish".
@@ -31,4 +31,12 @@ Nothing to publish — `/plugin marketplace add aldohushi1-stack/bearings` reads
 
 ## 4. Announce
 
-Copy for LinkedIn and X is in `docs/POST.md`. Lead with the number from `docs/MEASURING.md` if you have run it; otherwise lead with the express map.
+Copy for LinkedIn and X is in `docs/POST.md`: option C (the fridge note) to lead, option B (the honest number) as the follow-up post once the after arm has ten sessions. Post only after `npx get-bearings init` resolves on npm — the copy tells people to run it.
+
+## Tonight's order
+
+1. `push.cmd` → Actions → ci: nine green.
+2. `publish.cmd` → `npx get-bearings@0.2.0 --version` prints 0.2.0.
+3. Trusted publisher on npmjs.com (step 2.2 above) so the next release is a workflow run.
+4. Plugin smoke test (section 3) — this works already, it reads the repo, not npm.
+5. Post option C.

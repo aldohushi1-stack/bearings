@@ -1,6 +1,8 @@
 /node_modules/
 /.bearings/
 *.tgz
+*.bundle
 /.claude/settings.local.json
 /docs/private/
-/bearings.bundle
+/_protected-files/
+/push.cmd
